@@ -1,21 +1,41 @@
 package com.example.demo;
 
 import com.example.demo.model.requests.CreateUserRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+@WebAppConfiguration
+public class UserControllerTest {
+    protected MockMvc mockMvc;
+    @Autowired
+    WebApplicationContext webApplicationContext;
 
-public class UserControllerTest extends SupportTest {
-    @Override
     @Before
     public void configTest() {
-        super.configTest();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    protected String mappingData(Object object) throws JsonProcessingException {
+        ObjectMapper objMapper = new ObjectMapper();
+        return objMapper.writeValueAsString(object);
     }
 
     @Test
@@ -49,7 +69,7 @@ public class UserControllerTest extends SupportTest {
         rq.setPassword("khanhbui");
         rq.setConfirmPassword("khanhbui");
 
-        String js = super.mappingData(rq);
+        String js = mappingData(rq);
         MvcResult rs = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/create").contentType(MediaType.APPLICATION_JSON_VALUE).content(js)).andReturn();
         assertEquals(200, rs.getResponse().getStatus());
     }
@@ -61,7 +81,7 @@ public class UserControllerTest extends SupportTest {
         request.setPassword("khanh");
         request.setConfirmPassword("khanh");
 
-        String js = super.mappingData(request);
+        String js = mappingData(request);
         MvcResult rs = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/create").contentType(MediaType.APPLICATION_JSON_VALUE).content(js)).andReturn();
         assertEquals(400, rs.getResponse().getStatus());
     }
@@ -73,7 +93,7 @@ public class UserControllerTest extends SupportTest {
         rq.setPassword("khanhbui");
         rq.setConfirmPassword("khanhvan");
 
-        String js = super.mappingData(rq);
+        String js = mappingData(rq);
         MvcResult rs = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/create").contentType(MediaType.APPLICATION_JSON_VALUE).content(js)).andReturn();
         assertEquals(400, rs.getResponse().getStatus());
     }
